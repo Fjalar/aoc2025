@@ -8,4 +8,5 @@ Advent of Code 2025 using Rust and [this template](https://github.com/fspoettel/
 | [Day 1](https://adventofcode.com/2025/day/1) | ⭐ | ⭐ |
 | [Day 2](https://adventofcode.com/2025/day/2) | ⭐ | ⭐ |
 | [Day 3](https://adventofcode.com/2025/day/3) | ⭐ | ⭐ |
+| [Day 4](https://adventofcode.com/2025/day/4) | ⭐ | ⭐ |
 <!--- advent_readme_stars table --->
