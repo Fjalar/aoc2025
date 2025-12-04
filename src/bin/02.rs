@@ -55,10 +55,11 @@ pub fn part_two(input: &str) -> Option<u64> {
                             //
                             if length == 1 {
                                 return false;
-                            }
-                            if c.iter().all_equal() {
+                            } else if c.iter().all_equal() {
                                 // println!("skip because all were same {c:?}");
                                 return true;
+                            } else if length % 2 != 0 {
+                                return false;
                             }
 
                             (2..length).any(|split_len| {
