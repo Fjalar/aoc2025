@@ -29,36 +29,10 @@ pub fn part_one(input: &str) -> Option<u64> {
             .cartesian_product(0..x_len)
             .filter(|&(x, y)| {
                 if grid[y][x] {
-                    let lower_x;
-                    let lower_y;
-                    let higher_x;
-                    let higher_y;
-                    // println!("{x},{y} was @");
-                    if let Some(x_sub_one) = x.checked_sub(1) {
-                        lower_x = x_sub_one;
-                    } else {
-                        lower_x = x;
-                    }
-                    if let Some(y_sub_one) = y.checked_sub(1) {
-                        lower_y = y_sub_one;
-                    } else {
-                        lower_y = y;
-                    }
-
-                    if let Some(x_add_one) = x.checked_add(1)
-                        && x_add_one < x_len
-                    {
-                        higher_x = x_add_one;
-                    } else {
-                        higher_x = x;
-                    }
-                    if let Some(y_add_one) = y.checked_add(1)
-                        && y_add_one < y_len
-                    {
-                        higher_y = y_add_one;
-                    } else {
-                        higher_y = y;
-                    }
+                    let lower_x = x.saturating_sub(1);
+                    let lower_y = y.saturating_sub(1);
+                    let higher_x = (x + 1).clamp(0, x_len - 1);
+                    let higher_y = (y + 1).clamp(0, y_len - 1);
 
                     // println!("bounds: {lower_x}..{higher_x}, {lower_y}..{higher_y}");
 
@@ -94,35 +68,11 @@ pub fn part_two(input: &str) -> Option<u64> {
             .cartesian_product(0..x_len)
             .filter(|&(x, y)| {
                 if grid[y][x] {
-                    let lower_x;
-                    let lower_y;
-                    let higher_x;
-                    let higher_y;
+                    let lower_x = x.saturating_sub(1);
+                    let lower_y = y.saturating_sub(1);
+                    let higher_x = (x + 1).clamp(0, x_len - 1);
+                    let higher_y = (y + 1).clamp(0, y_len - 1);
                     // println!("{x},{y} was @");
-                    if let Some(x_sub_one) = x.checked_sub(1) {
-                        lower_x = x_sub_one;
-                    } else {
-                        lower_x = x;
-                    }
-                    if let Some(y_sub_one) = y.checked_sub(1) {
-                        lower_y = y_sub_one;
-                    } else {
-                        lower_y = y;
-                    }
-                    if let Some(x_add_one) = x.checked_add(1)
-                        && x_add_one < x_len
-                    {
-                        higher_x = x_add_one;
-                    } else {
-                        higher_x = x;
-                    }
-                    if let Some(y_add_one) = y.checked_add(1)
-                        && y_add_one < y_len
-                    {
-                        higher_y = y_add_one;
-                    } else {
-                        higher_y = y;
-                    }
 
                     let at_count = (lower_x..=higher_x)
                         .cartesian_product(lower_y..=higher_y)
