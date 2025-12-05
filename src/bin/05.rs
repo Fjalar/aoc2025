@@ -46,9 +46,9 @@ pub fn part_two(input: &str) -> Option<u64> {
 
     counted_ranges.sort();
 
-    for row in counted_ranges {
-        println!("{row:?}");
-    }
+    // for row in counted_ranges {
+    //     println!("{row:?}");
+    // }
 
     Some(ans)
 }
@@ -58,9 +58,11 @@ fn check_and_add(counted_ranges: &mut Vec<(u64, u64)>, new: (u64, u64)) -> u64 {
     let mut upper_bound = new.1;
 
     for prev in counted_ranges.clone() {
-        let lower_contained = (lower_bound..=upper_bound).contains(&prev.0);
-        let upper_contained = (lower_bound..=upper_bound).contains(&prev.1);
-        if lower_contained && upper_contained {
+        let prev_lower_contained = (lower_bound..=upper_bound).contains(&prev.0);
+        let prev_upper_contained = (lower_bound..=upper_bound).contains(&prev.1);
+        let new_lower_contained = (prev.0..=prev.1).contains(&new.0);
+        let new_upper_contained = (prev.0..=prev.1).contains(&new.1);
+        if prev_lower_contained && prev_upper_contained {
             let lower_sum = if prev.0 > lower_bound {
                 check_and_add(counted_ranges, (lower_bound, prev.0 - 1))
             } else {
@@ -71,12 +73,14 @@ fn check_and_add(counted_ranges: &mut Vec<(u64, u64)>, new: (u64, u64)) -> u64 {
             } else {
                 0
             };
-            print!("lower: {lower_sum}, upper: {upper_sum}\t");
+            // println!("lower: {lower_sum}, upper: {upper_sum}");
             return lower_sum + upper_sum;
-        } else if lower_contained {
+        } else if prev_lower_contained {
             upper_bound = prev.0 - 1;
-        } else if upper_contained {
+        } else if prev_upper_contained {
             lower_bound = prev.1 + 1;
+        } else if new_lower_contained && new_upper_contained {
+            return 0;
         }
         if lower_bound > upper_bound {
             return 0;
@@ -87,7 +91,7 @@ fn check_and_add(counted_ranges: &mut Vec<(u64, u64)>, new: (u64, u64)) -> u64 {
         //     "{new:?}: found {lower_bound}-{upper_bound} resulting in {}",
         //     upper_bound - lower_bound + 1
         // );
-        println!();
+        // println!();
         counted_ranges.push((lower_bound, upper_bound));
         upper_bound - lower_bound + 1
     } else {
