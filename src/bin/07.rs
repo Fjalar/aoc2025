@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    env::current_exe,
-};
+use std::collections::{BTreeMap, BTreeSet};
 
 use itertools::Itertools;
 
