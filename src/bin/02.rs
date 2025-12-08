@@ -12,17 +12,40 @@ pub fn part_one(input: &str) -> Option<u64> {
                 .map(|range| {
                     // println!("{range}");
                     let (left, right) = range.split_once("-").unwrap();
-                    let num_range =
-                        (left.parse::<u64>().unwrap())..=(right.parse::<u64>().unwrap());
-                    num_range
-                        .filter(|num| {
+                    let (left_num, right_num) =
+                        (left.parse::<u64>().unwrap(), right.parse::<u64>().unwrap());
+
+                    let num_range = (left_num)..=(right_num);
+                    // println!("num_range: {num_range:?}");
+
+                    let (left_one, left_two) = left.split_at(left.len() / 2);
+                    let (right_one, right_two) = right.split_at(right.len() / 2);
+
+                    let lower_bound = if left_one.is_empty() {
+                        left_two.parse::<u64>().unwrap()
+                    } else {
+                        left_one.parse::<u64>().unwrap()
+                    };
+
+                    let upper_bound = [left_one, left_two, right_one, right_two]
+                        .into_iter()
+                        .filter(|s| !s.is_empty())
+                        .map(|s| s.parse::<u64>().unwrap())
+                        .max()
+                        .unwrap();
+
+                    // println!("bounds: {lower_bound}{lower_bound}-{upper_bound}{upper_bound}");
+
+                    (lower_bound..=upper_bound)
+                        .filter_map(|num| {
                             let s = num.to_string();
-                            let l = s.len();
-                            if l % 2 == 0 {
-                                let (left_s, right_s) = s.split_at(l / 2);
-                                left_s == right_s
+                            let concat = s.repeat(2);
+                            let new_num = concat.parse::<u64>().unwrap();
+                            // println!("{new_num}");
+                            if num_range.contains(&new_num) {
+                                Some(new_num)
                             } else {
-                                false
+                                None
                             }
                         })
                         .sum::<u64>()
