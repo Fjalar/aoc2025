@@ -1,3 +1,4 @@
+use hashbrown::HashSet;
 use std::collections::{BTreeMap, BTreeSet};
 
 use itertools::Itertools;
@@ -40,7 +41,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     //     .iter()
     //     .for_each(|entry| println!("{entry:?}"));
 
-    let mut circuits = Vec::<BTreeSet<(u32, u32, u32)>>::new();
+    let mut circuits = Vec::<HashSet<(u32, u32, u32)>>::new();
 
     for smallest_entry in mutual_distances {
         // println!("\nConnection: {smallest_entry:?}");
@@ -77,7 +78,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                         .clone()
                         .union(&circuits[j])
                         .copied()
-                        .collect::<BTreeSet<_>>();
+                        .collect::<HashSet<_>>();
                     circuits.swap_remove(j);
                     break;
                 }
@@ -86,7 +87,7 @@ pub fn part_one(input: &str) -> Option<u64> {
             i += 1;
         }
 
-        let mut new_circuit = BTreeSet::<(u32, u32, u32)>::new();
+        let mut new_circuit = HashSet::<(u32, u32, u32)>::new();
         if boxes.contains(&left) {
             new_circuit.insert(left);
             boxes.remove(&left);
@@ -101,7 +102,7 @@ pub fn part_one(input: &str) -> Option<u64> {
     }
 
     for remaining_box in boxes {
-        circuits.push(BTreeSet::from([remaining_box]));
+        circuits.push(HashSet::from([remaining_box]));
     }
 
     // for circuit in &circuits {
@@ -128,7 +129,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                 z.parse::<u32>().unwrap(),
             )
         })
-        .collect::<BTreeSet<_>>();
+        .collect::<HashSet<_>>();
 
     let mutual_distances = boxes
         .iter()
@@ -150,7 +151,7 @@ pub fn part_two(input: &str) -> Option<u64> {
     //     println!("{:?}", mutual_distances[i]);
     // }
 
-    let mut circuits = Vec::<BTreeSet<(u32, u32, u32)>>::new();
+    let mut circuits = Vec::<HashSet<(u32, u32, u32)>>::new();
 
     for connection in mutual_distances {
         let (left, right) = connection.0;
@@ -186,7 +187,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                         .clone()
                         .union(&circuits[j])
                         .copied()
-                        .collect::<BTreeSet<_>>();
+                        .collect::<HashSet<_>>();
                     circuits.swap_remove(j);
                     break;
                 }
@@ -195,7 +196,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             i += 1;
         }
 
-        let mut new_circuit = BTreeSet::<(u32, u32, u32)>::new();
+        let mut new_circuit = HashSet::<(u32, u32, u32)>::new();
         if boxes.contains(&left) {
             new_circuit.insert(left);
             boxes.remove(&left);
