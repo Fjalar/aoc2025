@@ -61,51 +61,77 @@ pub fn part_two(input: &str) -> Option<u64> {
     let ans = input
         .trim()
         .lines()
-        .map(|line| {
-            line.trim()
-                .split(",")
-                .map(|range| {
-                    // println!("\n{range}:");
-                    let (left, right) = range.split_once("-").unwrap();
-                    let num_range =
-                        (left.parse::<u64>().unwrap())..=(right.parse::<u64>().unwrap());
-                    num_range
-                        .filter(|num| {
-                            let s = num.to_string();
-                            let length = s.len();
-                            let c = s.as_bytes();
-                            // println!("{num}");
-                            //
-                            if length == 1 {
-                                return false;
-                            } else if c.iter().all_equal() {
-                                // println!("skip because all were same {c:?}");
-                                return true;
+        .flat_map(|line| {
+            line.trim().split(",").map(|range| {
+                // println!("\n\n{range}:\n");
+                let (left, right) = range.split_once("-").unwrap();
+
+                let (left_num, right_num) =
+                    (left.parse::<u64>().unwrap(), right.parse::<u64>().unwrap());
+
+                let num_range = left_num..=right_num;
+
+                let left_digits = left.len();
+                let right_digits = right.len();
+
+                (2..=(left_digits).max(right_digits))
+                    .flat_map(|parts| {
+                        // println!("divided into {parts} parts");
+
+                        let num_range = num_range.clone();
+
+                        let part_length = if left_digits % parts == 0 {
+                            left_digits / parts
+                        } else if right_digits % parts == 0 {
+                            right_digits / parts
+                        } else {
+                            0
+                        };
+
+                        let min;
+                        let max;
+
+                        if part_length == 0 {
+                            min = 0;
+                            max = 0;
+                        } else {
+                            let min_left = left
+                                .chars()
+                                .chunks(part_length)
+                                .into_iter()
+                                .map(|chunk| String::from_iter(chunk).parse::<u64>().unwrap())
+                                .min()
+                                .unwrap();
+
+                            let min_right = right
+                                .chars()
+                                .chunks(part_length)
+                                .into_iter()
+                                .map(|chunk| String::from_iter(chunk).parse::<u64>().unwrap())
+                                .min()
+                                .unwrap();
+
+                            min = min_left.min(min_right);
+                            max = '9'.to_string().repeat(part_length).parse::<u64>().unwrap();
+                        }
+
+                        (min..=max).filter_map(move |part: u64| {
+                            let s = part.to_string();
+                            let concat = s.trim().repeat(parts);
+                            // println!("{concat}");
+                            let new_num = concat.parse::<u64>().unwrap();
+                            if num_range.contains(&new_num) {
+                                // print!("{new_num},");
+                                Some(new_num)
+                            } else {
+                                None
                             }
-
-                            (2..length).any(|split_len| {
-                                if length % split_len == 0 {
-                                    let split_count = length / split_len;
-                                    // println!("split_len: {split_len}, split_count: {split_count}",);
-
-                                    (0..(split_count))
-                                        // .inspect(|n| println!("{n}"))
-                                        .map(|split_count| {
-                                            // println!("split_count inside: {split_count}");
-                                            let start = split_count * split_len;
-                                            let end = start + split_len;
-                                            &c[start..end]
-                                        })
-                                        .all_equal()
-                                } else {
-                                    false
-                                }
-                            })
                         })
-                        // .inspect(|num| print!("{num},"))
-                        .sum::<u64>()
-                })
-                .sum::<u64>()
+                    })
+                    .sorted()
+                    .dedup()
+                    .sum::<u64>()
+            })
         })
         .sum::<u64>();
 
