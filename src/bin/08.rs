@@ -33,13 +33,9 @@ pub fn part_one(input: &str) -> Option<u64> {
                     + one.2.abs_diff(two.2).pow(2),
             )
         })
-        .collect::<BTreeMap<((u64, u64, u64), (u64, u64, u64)), u64>>();
-
-    let mutual_distances = mutual_distances
-        .iter()
-        .sorted_by_key(|(_, dist)| **dist)
+        .sorted_by_key(|(_, dist)| *dist)
         .take(number_of_connections)
-        .collect_vec();
+        .collect::<BTreeMap<((u64, u64, u64), (u64, u64, u64)), u64>>();
 
     // mutual_distances
     //     .iter()
@@ -47,39 +43,58 @@ pub fn part_one(input: &str) -> Option<u64> {
 
     let mut circuits = Vec::<BTreeSet<(u64, u64, u64)>>::new();
 
-    'outer: for smallest_entry in mutual_distances {
+    for smallest_entry in mutual_distances {
         // println!("\nConnection: {smallest_entry:?}");
 
         let (left, right) = smallest_entry.0;
 
-        for circuit in &mut circuits {
-            if circuit.contains(left)
+        let mut i = 0;
+        while i < circuits.len() {
+            if circuits[i].contains(&left)
             // && boxes.contains(right) {
             {
                 // println!("Found left box in existing circuit");
-                boxes.remove(right);
-                circuit.insert(*right);
-                continue 'outer;
-            }
-            if circuit.contains(right)
+                boxes.remove(&right);
+                circuits[i].insert(right);
+            } else if circuits[i].contains(&right)
             // boxes.contains(left) {
             {
                 // println!("Found right box in existing circuit");
-                boxes.remove(left);
-                circuit.insert(*left);
-                continue 'outer;
+                boxes.remove(&left);
+                circuits[i].insert(left);
+            } else {
+                i += 1;
+                continue;
             }
+
+            // Merge
+            for j in 0..circuits.len() {
+                if circuits[i] != circuits[j] && !circuits[j].is_disjoint(&circuits[i]) {
+                    // println!(
+                    //     "found intersection with {:?}",
+                    //     circuits[i].intersection(&circuits[j])
+                    // );
+                    circuits[i] = circuits[i]
+                        .clone()
+                        .union(&circuits[j])
+                        .copied()
+                        .collect::<BTreeSet<_>>();
+                    circuits.swap_remove(j);
+                    break;
+                }
+            }
+
+            i += 1;
         }
-        // println!("Found no box in existing circuit");
 
         let mut new_circuit = BTreeSet::<(u64, u64, u64)>::new();
-        if boxes.contains(left) {
-            new_circuit.insert(*left);
-            boxes.remove(left);
+        if boxes.contains(&left) {
+            new_circuit.insert(left);
+            boxes.remove(&left);
         }
-        if boxes.contains(right) {
-            new_circuit.insert(*right);
-            boxes.remove(right);
+        if boxes.contains(&right) {
+            new_circuit.insert(right);
+            boxes.remove(&right);
         }
         if !new_circuit.is_empty() {
             circuits.push(new_circuit);
@@ -90,44 +105,9 @@ pub fn part_one(input: &str) -> Option<u64> {
         circuits.push(BTreeSet::from([remaining_box]));
     }
 
-    // println!("--- BEFORE MERGE ---");
-
     // for circuit in &circuits {
     //     println!("{circuit:?}");
     // }
-
-    // println!("len: {}", circuits.len());
-    // println!("len of first: {}", circuits[0].len());
-
-    'outer2: loop {
-        let len = circuits.len();
-        for i in 0..len {
-            for j in (i + 1)..len {
-                if !circuits[i].is_disjoint(&circuits[j]) {
-                    // println!(
-                    //     "found intersection with {:?}",
-                    //     circuits[i].intersection(&circuits[j])
-                    // );
-                    circuits[i] = circuits[i]
-                        .union(&circuits[j])
-                        .copied()
-                        .collect::<BTreeSet<_>>();
-                    circuits.swap_remove(j);
-                    continue 'outer2;
-                }
-            }
-        }
-        break;
-    }
-
-    // println!("--- AFTER MERGE ---");
-
-    // for circuit in &circuits {
-    //     println!("{circuit:?}");
-    // }
-
-    // println!("len: {}", circuits.len());
-    // println!("len of first: {}", circuits[0].len());
 
     let three_largest_multiplied = circuits
         .iter()
