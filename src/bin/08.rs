@@ -33,7 +33,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                     + one.2.abs_diff(two.2).pow(2),
             )
         })
-        .sorted_by_key(|(_, dist)| *dist)
+        .sorted_unstable_by_key(|(_, dist)| *dist)
         .take(number_of_connections)
         .collect::<BTreeMap<((u64, u64, u64), (u64, u64, u64)), u64>>();
 
@@ -144,7 +144,7 @@ pub fn part_two(input: &str) -> Option<u64> {
                     + one.2.abs_diff(two.2).pow(2),
             )
         })
-        .sorted_by_key(|(_, dist)| *dist)
+        .sorted_unstable_by_key(|(_, dist)| *dist)
         .collect::<Vec<(((u64, u64, u64), (u64, u64, u64)), u64)>>();
 
     let mut circuits = Vec::<BTreeSet<(u64, u64, u64)>>::new();
