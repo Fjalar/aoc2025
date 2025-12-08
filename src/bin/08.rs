@@ -10,9 +10,9 @@ pub fn part_one(input: &str) -> Option<u64> {
         .map(|line| {
             let (x, y, z) = line.split(',').collect_tuple().unwrap();
             (
-                x.parse::<u64>().unwrap(),
-                y.parse::<u64>().unwrap(),
-                z.parse::<u64>().unwrap(),
+                x.parse::<u32>().unwrap(),
+                y.parse::<u32>().unwrap(),
+                z.parse::<u32>().unwrap(),
             )
         })
         .collect::<BTreeSet<_>>();
@@ -28,19 +28,19 @@ pub fn part_one(input: &str) -> Option<u64> {
             let two = v[1];
             (
                 (*one, *two),
-                one.0.abs_diff(two.0).pow(2)
-                    + one.1.abs_diff(two.1).pow(2)
-                    + one.2.abs_diff(two.2).pow(2),
+                (one.0 as u64).abs_diff(two.0 as u64).pow(2)
+                    + (one.1 as u64).abs_diff(two.1 as u64).pow(2)
+                    + (one.2 as u64).abs_diff(two.2 as u64).pow(2),
             )
         })
         .k_smallest_by_key(number_of_connections, |(_, dist)| *dist)
-        .collect::<BTreeMap<((u64, u64, u64), (u64, u64, u64)), u64>>();
+        .collect::<BTreeMap<((u32, u32, u32), (u32, u32, u32)), u64>>();
 
     // mutual_distances
     //     .iter()
     //     .for_each(|entry| println!("{entry:?}"));
 
-    let mut circuits = Vec::<BTreeSet<(u64, u64, u64)>>::new();
+    let mut circuits = Vec::<BTreeSet<(u32, u32, u32)>>::new();
 
     for smallest_entry in mutual_distances {
         // println!("\nConnection: {smallest_entry:?}");
@@ -86,7 +86,7 @@ pub fn part_one(input: &str) -> Option<u64> {
             i += 1;
         }
 
-        let mut new_circuit = BTreeSet::<(u64, u64, u64)>::new();
+        let mut new_circuit = BTreeSet::<(u32, u32, u32)>::new();
         if boxes.contains(&left) {
             new_circuit.insert(left);
             boxes.remove(&left);
@@ -123,9 +123,9 @@ pub fn part_two(input: &str) -> Option<u64> {
         .map(|line| {
             let (x, y, z) = line.split(',').collect_tuple().unwrap();
             (
-                x.parse::<u64>().unwrap(),
-                y.parse::<u64>().unwrap(),
-                z.parse::<u64>().unwrap(),
+                x.parse::<u32>().unwrap(),
+                y.parse::<u32>().unwrap(),
+                z.parse::<u32>().unwrap(),
             )
         })
         .collect::<BTreeSet<_>>();
@@ -138,15 +138,19 @@ pub fn part_two(input: &str) -> Option<u64> {
             let two = v[1];
             (
                 (*one, *two),
-                one.0.abs_diff(two.0).pow(2)
-                    + one.1.abs_diff(two.1).pow(2)
-                    + one.2.abs_diff(two.2).pow(2),
+                (one.0 as u64).abs_diff(two.0 as u64).pow(2)
+                    + (one.1 as u64).abs_diff(two.1 as u64).pow(2)
+                    + (one.2 as u64).abs_diff(two.2 as u64).pow(2),
             )
         })
         .sorted_unstable_by_key(|(_, dist)| *dist)
-        .collect::<Vec<(((u64, u64, u64), (u64, u64, u64)), u64)>>();
+        .collect::<Vec<(((u32, u32, u32), (u32, u32, u32)), u64)>>();
 
-    let mut circuits = Vec::<BTreeSet<(u64, u64, u64)>>::new();
+    // for i in 0..10 {
+    //     println!("{:?}", mutual_distances[i]);
+    // }
+
+    let mut circuits = Vec::<BTreeSet<(u32, u32, u32)>>::new();
 
     for connection in mutual_distances {
         let (left, right) = connection.0;
@@ -191,7 +195,7 @@ pub fn part_two(input: &str) -> Option<u64> {
             i += 1;
         }
 
-        let mut new_circuit = BTreeSet::<(u64, u64, u64)>::new();
+        let mut new_circuit = BTreeSet::<(u32, u32, u32)>::new();
         if boxes.contains(&left) {
             new_circuit.insert(left);
             boxes.remove(&left);
@@ -206,7 +210,7 @@ pub fn part_two(input: &str) -> Option<u64> {
         // println!("{}", circuits.len());
 
         if boxes.is_empty() && circuits.len() == 1 {
-            return Some(connection.0.0.0 * connection.0.1.0);
+            return Some(connection.0.0.0 as u64 * connection.0.1.0 as u64);
         }
     }
 
