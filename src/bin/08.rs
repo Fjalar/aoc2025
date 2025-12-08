@@ -173,22 +173,43 @@ pub fn part_two(input: &str) -> Option<u64> {
         let (left, right) = connection.0;
 
         // Add new connection
-        for circuit in &mut circuits {
-            if circuit.contains(&left)
+        let mut i = 0;
+        while i < circuits.len() {
+            if circuits[i].contains(&left)
             // && boxes.contains(right) {
             {
                 // println!("Found left box in existing circuit");
                 boxes.remove(&right);
-                circuit.insert(right);
-                break;
-            } else if circuit.contains(&right)
+                circuits[i].insert(right);
+            } else if circuits[i].contains(&right)
             // boxes.contains(left) {
             {
                 // println!("Found right box in existing circuit");
                 boxes.remove(&left);
-                circuit.insert(left);
-                break;
+                circuits[i].insert(left);
+            } else {
+                i += 1;
+                continue;
             }
+
+            // Merge
+            for j in 0..circuits.len() {
+                if circuits[i] != circuits[j] && !circuits[j].is_disjoint(&circuits[i]) {
+                    // println!(
+                    //     "found intersection with {:?}",
+                    //     circuits[i].intersection(&circuits[j])
+                    // );
+                    circuits[i] = circuits[i]
+                        .clone()
+                        .union(&circuits[j])
+                        .copied()
+                        .collect::<BTreeSet<_>>();
+                    circuits.swap_remove(j);
+                    break;
+                }
+            }
+
+            i += 1;
         }
 
         let mut new_circuit = BTreeSet::<(u64, u64, u64)>::new();
@@ -203,29 +224,6 @@ pub fn part_two(input: &str) -> Option<u64> {
         if !new_circuit.is_empty() {
             circuits.push(new_circuit);
         }
-
-        // Merge
-        'outer2: loop {
-            let len = circuits.len();
-            for i in 0..len {
-                for j in (i + 1)..len {
-                    if !circuits[i].is_disjoint(&circuits[j]) {
-                        // println!(
-                        //     "found intersection with {:?}",
-                        //     circuits[i].intersection(&circuits[j])
-                        // );
-                        circuits[i] = circuits[i]
-                            .union(&circuits[j])
-                            .copied()
-                            .collect::<BTreeSet<_>>();
-                        circuits.swap_remove(j);
-                        continue 'outer2;
-                    }
-                }
-            }
-            break;
-        }
-
         // println!("{}", circuits.len());
 
         if boxes.is_empty() && circuits.len() == 1 {
