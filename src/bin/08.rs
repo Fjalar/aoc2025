@@ -33,7 +33,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                     + one.2.abs_diff(two.2).pow(2),
             )
         })
-        .k_largest_by_key(number_of_connections, |(_, dist)| *dist)
+        .k_smallest_by_key(number_of_connections, |(_, dist)| *dist)
         .collect::<BTreeMap<((u64, u64, u64), (u64, u64, u64)), u64>>();
 
     // mutual_distances
