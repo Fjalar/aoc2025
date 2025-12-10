@@ -1,18 +1,19 @@
 use std::fmt;
 
 use itertools::Itertools;
+use ndarray::{ArcArray2, prelude::*};
+use ndarray_linalg::{self, Solve};
 
 advent_of_code::solution!(10);
 
 pub fn part_one(input: &str) -> Option<u64> {
     let subprobs = input.lines().map(SubProbPart1::from).collect_vec();
 
-    subprobs.iter().for_each(|s| println!("{s}"));
+    // subprobs.iter().for_each(|s| println!("{s}"));
 
     let ans = subprobs
         .iter()
         .map(|sub| {
-            println!("{sub}");
             let mut max_depth = 1;
             // print!("Testing depth...");
             loop {
@@ -22,7 +23,7 @@ pub fn part_one(input: &str) -> Option<u64> {
                 }
                 max_depth += 1;
             }
-            println!();
+            // println!();
             max_depth
         })
         .sum::<u16>() as u64;
@@ -31,7 +32,23 @@ pub fn part_one(input: &str) -> Option<u64> {
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
-    None
+    let subprobs = input.lines().map(SubProbPart2::from).collect_vec();
+
+    let ans = subprobs
+        .iter()
+        .map(|sub| {
+            println!("{}", sub.a);
+            println!("{}", sub.b);
+
+            let x = sub.a.solve_into(sub.b.clone()).unwrap();
+
+            println!("{x}");
+
+            0
+        })
+        .sum::<u16>() as u64;
+
+    Some(ans)
 }
 
 fn p1recurse(lights: u16, buttons: &[u16], depth: u16, max_depth: u16) -> bool {
@@ -121,6 +138,70 @@ impl From<&str> for SubProbPart1 {
     }
 }
 
+struct SubProbPart2 {
+    a: Array2<f64>,
+    b: Array1<f64>,
+}
+
+impl From<&str> for SubProbPart2 {
+    fn from(value: &str) -> Self {
+        let (_, value) = value.split_once(" ").unwrap();
+        let (buttons, joltage) = value.rsplit_once(" ").unwrap();
+
+        let joltage = joltage
+            .strip_prefix('{')
+            .unwrap()
+            .strip_suffix('}')
+            .unwrap()
+            .split(',')
+            .map(|c| c.parse::<f64>().unwrap())
+            .collect_vec();
+
+        let buttons = buttons
+            .split_whitespace()
+            .map(|button| {
+                button
+                    .strip_prefix('(')
+                    .unwrap()
+                    .strip_suffix(')')
+                    .unwrap()
+                    .split(",")
+                    .map(|s| s.parse::<u16>().unwrap())
+                    .collect_vec()
+            })
+            .collect_vec();
+
+        let mut constraints = Vec::new();
+
+        (0..joltage.len()).for_each(|lamp_idx| {
+            constraints.push(
+                buttons
+                    .iter()
+                    .map(|button| {
+                        if button.contains(&(lamp_idx as u16)) {
+                            1f64
+                        } else {
+                            0f64
+                        }
+                    })
+                    .collect_vec(),
+            );
+        });
+
+        let mut a = Array2::zeros((constraints.len(), constraints.first().unwrap().len()));
+
+        for row in 0..constraints.len() {
+            for col in 0..constraints[row].len() {
+                a[[row, col]] = constraints[row][col];
+            }
+        }
+
+        let b = Array1::from_vec(joltage);
+
+        SubProbPart2 { a, b }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -134,6 +215,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let result = part_two(&advent_of_code::template::read_file("examples", DAY));
-        assert_eq!(result, None);
+        assert_eq!(result, Some(33));
     }
 }

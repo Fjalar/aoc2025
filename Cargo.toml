@@ -30,3 +30,5 @@ tinyjson = "2.5.1"
 # Solution dependencies
 itertools = "0.14.0"
 hashbrown = "0.16.1"
+ndarray-linalg = { version = "0.18", features = ["openblas-static"] }
+ndarray = "0.17.1"
