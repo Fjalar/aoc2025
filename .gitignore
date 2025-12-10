@@ -30,3 +30,9 @@ dhat-heap.json
 data/timings.json
 *.svg
 perf.data*
+
+# sketches
+*.xcf
+*.png
+*.jpg
+*.jpeg
