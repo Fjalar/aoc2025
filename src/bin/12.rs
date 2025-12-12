@@ -44,7 +44,7 @@ pub fn part_one(input: &str) -> Option<u64> {
         .collect_array::<6>()
         .unwrap();
 
-    presents.iter().for_each(|present| println!("{present}"));
+    // presents.iter().for_each(|present| println!("{present}"));
 
     let regions = regions
         .lines()
@@ -61,9 +61,23 @@ pub fn part_one(input: &str) -> Option<u64> {
         })
         .collect_vec();
 
-    regions.iter().for_each(|region| println!("{region}"));
+    // regions.iter().for_each(|region| println!("{region}"));
 
-    None
+    let naive = regions
+        .iter()
+        .filter(|region| {
+            let total_area = region.x as u64 * region.y as u64;
+            let covered = region
+                .presents
+                .iter()
+                .enumerate()
+                .map(|(idx, count)| (presents[idx].covered_area() as u64) * (*count as u64))
+                .sum::<u64>();
+            covered <= total_area
+        })
+        .count() as u64;
+
+    Some(naive)
 }
 
 pub fn part_two(input: &str) -> Option<u64> {
@@ -75,6 +89,12 @@ struct Present {
     line1: u8,
     line2: u8,
     line3: u8,
+}
+
+impl Present {
+    fn covered_area(&self) -> u32 {
+        self.line1.count_ones() + self.line2.count_ones() + self.line3.count_ones()
+    }
 }
 
 impl fmt::Display for Present {
