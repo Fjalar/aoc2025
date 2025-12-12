@@ -1,6 +1,5 @@
 use hashbrown::HashSet;
 use itertools::Itertools;
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 
 advent_of_code::solution!(11);
 
@@ -176,7 +175,7 @@ fn visit_freestanding_p2(all: &[PosDevice], idx: usize, target: usize) -> u64 {
 
     all[idx]
         .connections
-        .par_iter()
+        .iter()
         .map(|&next_idx| {
             // print!("{next} ");
 
